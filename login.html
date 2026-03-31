@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Eucken House of Wigs</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --pink:#FF4D94; --pink-deep:#D4006A; --black:#0D0D0D; --grey:#666; --bg:#FAF8FB; --card:#FFFFFF; --border:#E8EAF0; --radius:14px; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; font-family:'DM Sans',sans-serif; background:linear-gradient(180deg,#fff7fb 0%,#f8f0f7 100%); color:var(--black); display:flex; align-items:center; justify-content:center; padding:24px; }
+  .wrapper { width:100%; max-width:420px; background:var(--card); border-radius:24px; box-shadow:0 28px 80px rgba(0,0,0,0.08); overflow:hidden; }
+  .hero { padding:36px 32px; background:linear-gradient(135deg,rgba(255,77,148,0.15),rgba(212,0,106,0.08)); }
+  .hero h1 { margin:0 0 12px; font-family:'Playfair Display',serif; font-size:2.4rem; line-height:1.05; }
+  .hero p { margin:0; color:var(--grey); font-size:0.95rem; line-height:1.7; }
+  .form { padding:32px; }
+  .form-group { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
+  label { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--grey); }
+  input { width:100%; padding:14px 16px; border:1px solid var(--border); border-radius:12px; font-size:1rem; outline:none; transition:border-color 0.2s; }
+  input:focus { border-color:var(--pink); }
+  button { width:100%; padding:14px 16px; border:none; border-radius:12px; background:var(--pink); color:white; font-size:1rem; font-weight:700; cursor:pointer; transition:background 0.25s; }
+  button:hover { background:var(--pink-deep); }
+  .message { min-height:22px; margin-bottom:12px; font-size:0.92rem; color:var(--danger); }
+  .lighter { color:var(--grey); font-size:0.9rem; margin-top:8px; text-align:center; }
+  .footer { padding:18px 32px 28px; display:flex; justify-content:space-between; align-items:center; background:#fff; border-top:1px solid var(--border); }
+  .footer a { color:var(--pink); text-decoration:none; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="hero">
+    <h1>Admin Access</h1>
+    <p>Only authorized team members can manage wigs and product settings.</p>
+  </div>
+  <div class="form">
+    <div class="message" id="loginMessage"></div>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your admin username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+    </div>
+    <button id="loginButton">Log In</button>
+    <p class="lighter">Only the store admins may access this area. If you are not an admin, return to the storefront.</p>
+  </div>
+  <div class="footer">
+    <a href="index.html">Back to Store</a>
+    <span style="font-size:0.9rem;color:var(--grey);">Secure admin access</span>
+  </div>
+</div>
+<script>
+const DEFAULT_ADMINS = [
+  { username: 'admin1', password: 'Eucken123', name: 'Admin One' },
+  { username: 'admin2', password: 'Slay456', name: 'Admin Two' },
+  { username: 'admin3', password: 'WigBoss789', name: 'Admin Three' }
+];
+
+function ensureAdminAccounts() {
+  if (!localStorage.getItem('eucken_admins')) {
+    localStorage.setItem('eucken_admins', JSON.stringify(DEFAULT_ADMINS));
+  }
+}
+
+ensureAdminAccounts();
+const ADMINS = JSON.parse(localStorage.getItem('eucken_admins') || '[]');
+
+if (localStorage.getItem('eucken_role') === 'admin') {
+  window.location.href = 'admin.html';
+}
+
+const message = document.getElementById('loginMessage');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const loginButton = document.getElementById('loginButton');
+
+function showMessage(text, isError = true) {
+  message.textContent = text;
+  message.style.color = isError ? '#d14343' : '#1f7a3e';
+}
+
+function handleLogin() {
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value;
+  const admin = ADMINS.find(item => item.username === username && item.password === password);
+  if (!admin) {
+    showMessage('Invalid username or password.');
+    return;
+  }
+  localStorage.setItem('eucken_role', 'admin');
+  localStorage.setItem('eucken_user', admin.name);
+  window.location.href = 'admin.html';
+}
+
+loginButton.addEventListener('click', handleLogin);
+passwordInput.addEventListener('keydown', event => { if (event.key === 'Enter') handleLogin(); });
+usernameInput.addEventListener('keydown', event => { if (event.key === 'Enter') handleLogin(); });
+</script>
+</body>
+</html>
